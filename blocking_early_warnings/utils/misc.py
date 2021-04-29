@@ -12,33 +12,36 @@ from typing import Type, List, Callable, Any
 from datetime import datetime, timedelta
 
 
-def get_hour_str(str_time : str ) -> datetime:
+def get_hour_str(str_time: str) -> datetime:
     """
-        Return a datetime with the same datetime in the str
-        but with minutes, seconds, and microseconds truncated
+    Return a datetime with the same datetime in the str
+    but with minutes, seconds, and microseconds truncated
     """
     time = datetime.strptime(str_time, DATE_FORMAT)
     return get_hour(time)
 
-def get_hour(time : datetime) -> datetime:
+
+def get_hour(time: datetime) -> datetime:
     """
-        Return the same datetime object but with minutes, seconds, 
-        microseconds truncated
+    Return the same datetime object but with minutes, seconds,
+    microseconds truncated
     """
     return time.replace(minute=0, second=0, microsecond=0)
 
+
 class Accumulator:
     """
-        Object holding a set of 
-        elements to be processed by a function once a 
-        certain ammount of elements is reached
+    Object holding a set of
+    elements to be processed by a function once a
+    certain ammount of elements is reached
     """
 
-    def __init__(   self, 
-                    callback : Callable[[List[Any]], Any],
-                    queue : List[Any] = [], 
-                    treshold : int = 1000
-                ):
+    def __init__(
+        self,
+        callback: Callable[[List[Any]], Any],
+        queue: List[Any] = [],
+        treshold: int = 1000,
+    ):
         """
         Parameters:
             + callback : Function([Any]) -> Any = function to call in stored queue once it's full
@@ -46,14 +49,14 @@ class Accumulator:
             + treshold : int = how many elements until a flush occurs
         """
         assert treshold > 0, "Treshold should be positive"
-        self.queue      = queue
-        self.treshold   = treshold
-        self.callback   = callback
+        self.queue = queue
+        self.treshold = treshold
+        self.callback = callback
 
-    def add(self, m : Model):
+    def add(self, m: Model):
         """
-            Add an object to be bulk-processed by the given 
-            callback function.
+        Add an object to be bulk-processed by the given
+        callback function.
         """
         self.queue.append(m)
         if len(self.queue) > self.treshold:
@@ -61,11 +64,10 @@ class Accumulator:
 
     def flush(self):
         """
-            Call callback function and empty stored queue
+        Call callback function and empty stored queue
         """
         self.callback(self.queue)
         self.queue = []
 
     def __del__(self):
         self.flush()
-    
