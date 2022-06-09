@@ -13,115 +13,137 @@ from blocking_early_warnings.models import ASN, UrlList, Url
 from typing import List
 
 
-def sync_urllists_db():
-    """
-    This function updates url lists to match those in the lists
-    """
-    urls = {}
-    lists = UrlList.objects.all()
+class ListLoader:
+    """Manage list loading into the database"""
 
-    for list in lists:
-        # get urls for this source
-        url_list = get_list_from_storage(list.source, list.storage_type)
-        url_list = get_urls_from_list_content(url_list, list.parse_strategy)
-
-        # store url in map
-        for url in url_list:
-
-            # if not in the dict, init it to an empty list
-            if (source_list := urls.get(url)) is None:
-                source_list = urls[url] = []
-
-            source_list.append(list)
-
-    # Delete non-relevant urls
-    non_relevant_urls = Url.objects.exclude(url__in=urls.keys())
-    non_relevant_urls.delete()
-
-    # update urls
-    for (url, lists) in urls.items():
-        url_object, _ = Url.objects.get_or_create(url=url, defaults={"url": url})
-        url_object.lists.clear()
+    def sync_urllists_db(self):
+        """
+        This function updates url lists to match those in the lists
+        """
+        urls = {}
+        lists = UrlList.objects.all()
 
         for list in lists:
-            url_object.lists.add(list)
+            # get urls for this source
+            # url_list = get_list_from_storage(list.source, list.storage_type)
+            # url_list = get_urls_from_list_content(url_list, list.parse_strategy)
+            url_list = self.get_urls_from_list(list)
 
-        url_object.save()
+            # store url in map
+            for url in url_list:
 
+                # if not in the dict, init it to an empty list
+                if (source_list := urls.get(url)) is None:
+                    source_list = urls[url] = []
 
-def get_list_from_storage(location: str, storage: str) -> str:
-    """
-    Get a list content located in "location" with storage type "storage"
-    Location may vary depending on storage type. For example, in a local_storage list,
-    location may be a file path, whilst in web_storage location may be an url
+                source_list.append(list)
 
-    Parameters:
-        + location : str = str specifying a mean to locate the list
-        + storage  : str = storage type, possible options specified by UrlList.StorageType enum
-    Return:
-        string with list content
-    """
+        # Delete non-relevant urls
+        non_relevant_urls = Url.objects.exclude(url__in=urls.keys())
+        non_relevant_urls.delete()
 
-    if storage == UrlList.StorageType.WEB_REQUEST:
-        return get_list_from_web_request(location)
-    if storage == UrlList.StorageType.LOCAL_STORAGE:
-        return get_list_from_local_storage(location)
-    else:
-        raise ValueError(f"Unrecognized storage type: {storage}")
+        # update urls
+        for (url, lists) in urls.items():
+            url_object, _ = Url.objects.get_or_create(url=url, defaults={"url": url})
+            url_object.lists.clear()
 
+            for list in lists:
+                url_object.lists.add(list)
 
-def get_list_from_local_storage(path: str) -> str:
-    """
-    Get list content from a local file
-    Parameters:
-        + path : str = path to file containing the list
-    Return:
-        string contained by the file
-    """
-    with open(path, "r") as list:
-        return list.read()
+            url_object.save()
 
+    def get_urls_from_list(self, list: UrlList) -> List[str]:
+        """Get urls from a list, parsing it according to the specified location, storage type and parse strategy
 
-def get_list_from_web_request(url: str) -> str:
-    """
-    Get list from a get request to a given url
-    Parameters:
-        + url : str = valid url to a list containing the list
-    Return:
-        string returned by the url
-    """
+        Args:
+            location (str): Where to locate the list. Ignored when storage_type == db
+            storage_type (StorageType): How this list is stored. Should request it from the web? Is it a local file? Can be retrieved from db?
+            parse_strategy (ParseStrategy): How to parse this list, should be one of the known ways. Ignored when storage_type == db
+            list_name (str): Name of this list, specially important for db-based lists
 
-    # Try to get data from url
-    try:
-        response = req.get(url)
-    except:
-        raise HTTPError(f"Could not retrieve urls from source: {url}")
+        Returns:
+            List[str]: resulting list of urls
+        """
 
-    # If could not retrieve data, raise an error
-    if response.status_code != 200:
-        raise HTTPError(f"Could not retrieve urls from source: {url}")
+        if list.storage_type == UrlList.StorageType.LOCAL_STORAGE:
+            url_list_str = self.get_list_from_local_storage(list.source)
+        elif list.storage_type == UrlList.StorageType.WEB_REQUEST:
+            url_list_str = self.get_list_from_web_request(list.source)
+        elif list.storage_type == UrlList.StorageType.DB:
+            return self.get_list_from_db(list)
+        else:
+            raise ValueError(f"Unrecognized storage type: {list.storage_type}")
 
-    return response.text
+        return self.parse_urls_from_list_content(url_list_str, list.parse_strategy)
 
+    def get_list_from_local_storage(self, path: str) -> str:
+        """
+        Get list content from a local file
+        Parameters:
+            + path : str = path to file containing the list
+        Return:
+            string contained by the file
+        """
+        with open(path, "r") as list:
+            return list.read()
 
-def get_urls_from_list_content(list_content: str, strategy: str) -> List[str]:
-    """
-    Get urls from a string with a list of urls.
-    Parameters:
-        + source_url : str = url list formated as specified by "strategy"
-        + strategy : str = strategy to parse text. Can be one of:
-                - citizen_lab_csv
-                - url_list_txt
-            Note that these variants are the same as in UrlList.ParseStrategy
-    Return:
-        URL list from the the given formated list
-    """
+    def get_list_from_web_request(self, url: str) -> str:
+        """
+        Get list from a get request to a given url
+        Parameters:
+            + url : str = valid url to a list containing the list
+        Return:
+            string returned by the url
+        """
 
-    # Parse urls according to the expected strategy
-    if strategy == UrlList.ParseStrategy.CITIZEN_LAB_CSV:
-        return parse_urls_from_csv_str(list_content)
-    elif strategy == UrlList.ParseStrategy.URL_LIST_TXT:
-        return parse_urls_from_txt_str(list_content)
+        # Try to get data from url
+        try:
+            response = req.get(url)
+        except:
+            raise HTTPError(f"Could not retrieve urls from source: {url}")
+
+        # If could not retrieve data, raise an error
+        if response.status_code != 200:
+            raise HTTPError(f"Could not retrieve urls from source: {url}")
+
+        return response.text
+
+    def get_list_from_db(self, url_list: UrlList) -> List[str]:
+        """Get urls related to the specified list of urls
+
+        Args:
+            list (UrlList): List object specifying the urls to retrieve
+
+        Returns:
+            List[str]: List of urls as strings
+        """
+
+        return [url.url for url in url_list.url_set.all()]  # type: ignore
+
+    def parse_urls_from_list_content(
+        self, list_content: str, strategy: str
+    ) -> List[str]:
+        """
+        Get urls from a string with a list of urls.
+        Parameters:
+            + source_url : str = url list formated as specified by "strategy"
+            + strategy : str = strategy to parse text. Can be one of:
+                    - citizen_lab_csv
+                    - url_list_txt
+                Note that these variants are the same as in UrlList.ParseStrategy
+        Return:
+            URL list from the the given formated list
+        """
+
+        # Parse urls according to the expected strategy
+        if strategy == UrlList.ParseStrategy.CITIZEN_LAB_CSV:
+            return parse_urls_from_csv_str(list_content)
+        elif strategy == UrlList.ParseStrategy.URL_LIST_TXT:
+            return parse_urls_from_txt_str(list_content)
+
+        raise ValueError(
+            f"'{strategy}' is not a valid strategy, choices are: {UrlList.ParseStrategy.values}"
+        )
 
 
 def parse_urls_from_csv_str(csv: str) -> List[str]:

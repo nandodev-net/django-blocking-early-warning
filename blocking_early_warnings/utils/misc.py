@@ -10,15 +10,18 @@ from blocking_early_warnings.settings import DATE_FORMAT
 # Python imports
 from typing import Type, List, Callable, Any
 from datetime import datetime, timedelta
+from pytz import utc
 
 
-def get_hour_str(str_time: str) -> datetime:
+def get_hour_from_str(str_time: str) -> datetime:
     """
     Return a datetime with the same datetime in the str
     but with minutes, seconds, and microseconds truncated
     """
     time = datetime.strptime(str_time, DATE_FORMAT)
-    return get_hour(time)
+    hour = get_hour(time)
+
+    return hour.replace(tzinfo=utc)
 
 
 def get_hour(time: datetime) -> datetime:

@@ -7,13 +7,18 @@ class UrlListAdmin(admin.ModelAdmin):
 
 
 class UrlAdmin(admin.ModelAdmin):
-    list_display = ["url"]
+    list_display = ["url", "alert_level"]
 
 
 class AsnAdmin(admin.ModelAdmin):
     list_display = ("name", "code")
 
 
+class MetricAdmin(admin.ModelAdmin):
+    list_display = ("url", "asn", "hour", "measurement_count", "anomaly_count")
+
+
 admin.site.register(UrlList, UrlListAdmin)
 admin.site.register(Url, UrlAdmin)
 admin.site.register(ASN, AsnAdmin)
+admin.site.register(Metric, MetricAdmin)
