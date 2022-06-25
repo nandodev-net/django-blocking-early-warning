@@ -191,6 +191,65 @@ class Metric(models.Model):
         return f"Metric(hour={self.hour}, anomaly_count={self.anomaly_count}, measurement_count={self.measurement_count}, asn={self.asn}, url={self.url})"
 
 
+class AnomalyReport(models.Model):
+    """Represents an anomaly event. It has all the relevant data to identify 
+    an anomaly.
+    """
+
+    class IssueType(models.TextChoices):
+        """Possible types of anomaly. Remember to update 
+        this enum if you add more issue types to the anomaly monitor module
+        """
+        OK = "ok"
+        SPIKE = "spike"
+        HIGH_ANOMALY_RATE = "high_anomaly_rate"
+
+
+    asn = models.ForeignKey(verbose_name="ASN", to=ASN, on_delete=models.CASCADE, null=False)
+    metrics = models.ManyToManyField(verbose_name="Offending metrics", to=Metric)
+    url = models.ForeignKey(verbose_name="Affected URL", to=Url, on_delete=models.CASCADE, null=False)
+    issue_type = models.TextField(verbose_name="Anomaly type", choices=IssueType.choices)
+    # TODO Should we add start time and end time?
+
+    @classmethod
+    def create_from_issue_description(cls, description) -> Self: 
+        """Create a new report from an issue description. If an identical report already exists, do nothing
+
+        Args:
+            description (IssueDescription ): Issue to use to build a new report
+
+        Returns:
+            Self: Report instance stored in database. It might be new or an already existent one depending if 
+            the given issue was new or not
+        """
+        from blocking_early_warnings.utils.anomaly_monitor import IssueDescription # Imported here to avoid circular dependencies
+
+        issue_description : IssueDescription = description
+        qs = cls.objects \
+            .all() \
+            .annotate(n_metrics = models.Count("metrics")) \
+            .filter(
+                asn=issue_description.asn, 
+                url=issue_description.url, 
+                issue_type = issue_description.issue_type.value,
+                n_metrics = len(issue_description.metrics)
+            )
+
+        # Chain multiple filters searching for the one that matches the same metrics
+        for m in issue_description.metrics:
+            qs = qs.filter(metrics=m)  
+
+        report, _ = qs.get_or_create(defaults={
+            "asn" : issue_description.asn,
+            "url" : issue_description.url,
+            "issue_type" : issue_description.issue_type.value,
+        })
+
+        report.metrics.set(issue_description.metrics)
+
+        return report
+
+
 class EarlyWarningSettings(models.Model):
     """Represents the moduel configuration editable via django admin"""
 
@@ -214,3 +273,4 @@ class EarlyWarningSettings(models.Model):
         """
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+

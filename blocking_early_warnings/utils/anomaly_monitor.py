@@ -107,7 +107,7 @@ class AnomalyMonitor:
         Args:
             start_time (Optional[datetime], optional): The lastest time to look for metrics. Defaults to 24 hours ago.
             tolerance (float, optional): A tolerance value telling how much variation  in the anomaly rate to accept. Defaults to TOLERANCE.
-
+            should_act (bool, optional) : If should do something if issues are found. Defaults to False. 
         Raises:
             NotImplementedError: _description_
 
