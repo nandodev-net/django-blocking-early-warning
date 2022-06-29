@@ -1,5 +1,5 @@
 """
-    Functions to request data from ooni
+    Functions to request data from ooni and save it to database if needed
 """
 # External imports
 from django.db.models import Max
