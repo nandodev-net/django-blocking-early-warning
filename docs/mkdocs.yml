@@ -1,0 +1,10 @@
+site_name: Early Warnings
+# site_url: https://early_warnings.com/
+
+nav:
+  - Home: index.md
+
+theme: readthedocs
+
+markdown_extensions:
+  - admonition
