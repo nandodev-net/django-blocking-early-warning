@@ -40,6 +40,7 @@ The early warnings app is a regular django app like many others, so the process 
 
 3. Back in your django project, you just have to add this app as you'd do with any django app. The first step is 
 **add the early warnings app to your installed apps**
+
         # settings.py
 
         INSTALLED_APPS = [
@@ -50,7 +51,6 @@ The early warnings app is a regular django app like many others, so the process 
         ]
 
 4. Now you have to **add early warnings urls to your site**:
-
 
         # urls.py
         # ...
@@ -72,6 +72,7 @@ The early warnings app is a regular django app like many others, so the process 
 
 5. And last but not least, we have to **run migrations** to add the database tables required by early warnings:
 
+        python manage.py makemigrations blocking_early_warnings
         python manage.py migrate
 
 And that's it, you now have the app succesfully installed in your project. You can check if everything's ok by 
