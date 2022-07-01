@@ -28,7 +28,8 @@ jobs:
         run: pip install mkdocs
 
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Build docs and publish
         run: |
+          git pull
           cd docs 
           mkdocs gh-deploy
