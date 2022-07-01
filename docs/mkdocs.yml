@@ -1,0 +1,14 @@
+site_name: Early Warnings
+# site_url: https://early_warnings.com/
+
+nav:
+  - Home: index.md
+  - User guide:
+    - user_guide/user_guide.md
+    - user_guide/url_lists.md
+    - user_guide/anomaly_types.md
+
+theme: readthedocs
+
+markdown_extensions:
+  - admonition
