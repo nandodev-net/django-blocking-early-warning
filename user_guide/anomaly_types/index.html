@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Anomaly types - Early Warnings</title>
+    <title>Anomaly Types - Early Warnings</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Anomaly types";
+        var mkdocs_page_name = "Anomaly Types";
         var mkdocs_page_input_path = "user_guide/anomaly_types.md";
         var mkdocs_page_url = null;
       </script>
@@ -50,7 +50,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../url_lists/">URL Lists</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Anomaly types</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Anomaly Types</a>
+    <ul class="current">
+    </ul>
                   </li>
               </ul>
       </div>
@@ -67,7 +69,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>User guide &raquo;</li><li>Anomaly types</li>
+          <li>User guide &raquo;</li><li>Anomaly Types</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -77,7 +79,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>WIP</p>
+                <h1 id="anomaly-types">Anomaly Types</h1>
+<p>The Early Warning System aims to help you to <strong>catch possible blocking events earlier</strong>. In order to do so, it will run some analysis 
+over recent sets of measurements in order to find something strange. In this section we will learn which kind of events might trigger 
+an anomaly.</p>
+<p>There's two main types of anomaly that the analyzer looks for, <strong>spikes</strong> and <strong>coninuous blocking</strong>. "Spikes" represent a sudden increment
+in anomalies for a given url, while "continuous blocking" represents an event where the affected URL is consistently unreachable for extended 
+periods of time.   </p>
+<p>The process that looks for these events runs periodically, and if it founds some of these anomalies, then it will send an email notification
+if the url is marked with a high enough alert level and if some email is provided.</p>
               
             </div>
           </div><footer>
