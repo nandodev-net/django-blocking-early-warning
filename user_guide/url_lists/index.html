@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>URL Lists - Early Warnings</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "URL Lists";
+        var mkdocs_page_input_path = "user_guide/url_lists.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Early Warnings
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../user_guide/">User guide</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">URL Lists</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#storage-types"> Storage types</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#database">Database</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#web-request">Web request</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#local-storage">Local Storage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-a-new-list">Creating a new list</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anomaly_types/">Anomaly types</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Early Warnings</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>User guide &raquo;</li><li>URL Lists</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="url-lists">URL Lists</h1>
+<p>One of the key features of the Early Warnings system is the hability to schedule measurements 
+for specific urls that might be interesting. Also, the way those urls are loaded might be different
+between use cases. For this reason, we provide at the least 3 ways to provide a list of urls according of 
+it's storage type. </p>
+<h2 id="storage-types"><a name="storage_types"></a> Storage types</h2>
+<p>Lists can specify their type of storage, (where they are loaded from). This way you can provide it with a path in your local
+disk where you edit the list's urls on the fly, or you can use a third party list like <a href="https://github.com/citizenlab/test-lists">citizen lab's</a>. Or you can simply
+go into the admin panel and add urls manually to a database-stored list. </p>
+<h3 id="database">Database</h3>
+<p>The database (db) storage allows you to just add urls to this list from the webpage. To add an URL to a database list, you go to the 
+url table in django admin panel:</p>
+<p><img alt="Urls table" src="../../img/user_guide/find_urls_table.png" /></p>
+<p>And here you can find an existent url or add new one by clicking in the <strong>"ADD URL +"</strong> button and filling the required fields.
+Either way, in the URL edition page you can add this url to a list by selecting the list itself and clicking save:</p>
+<p><img alt="Add url to list" src="../../img/user_guide/add_url_to_list.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The storage type is not important in this case since urls are just stored in the local database. <strong>Specifying a storage type
+for a database-based list will result in an error</strong>.</p>
+</div>
+<h3 id="web-request">Web request</h3>
+<p>This method will sync urls with a list that can be found by a web request to a specified url. The list should be provided as 
+raw text and follow one of the supported formats. For example, we use the csv list maintained by Citizen lab that can be found
+in <code>https://raw.githubusercontent.com/citizenlab/test-lists/master/lists/ve.csv</code>. This way the system can be kept in sync without human
+intervention. This is useful in cases like this where the list is provided by a third party, or when you want the list publicly available 
+so that multiple users can share the same list. Web Request lists are fetched in regular intervals to keep them on sync.</p>
+<p>The valid <strong>data formats</strong> for a list are the following: </p>
+<ul>
+<li>
+<p><strong>Citizen Lab Csv</strong> : a csv file that contains the url in the first column, just like <a href="https://raw.githubusercontent.com/citizenlab/test-lists/master/lists/ve.csv">this</a> from citizen lab.</p>
+</li>
+<li>
+<p><strong>Url List Txt</strong> : A txt file with a different url per line, for example:</p>
+<pre><code>    http://fncancer.org.ve/
+    https://futuropresente.com.ve/
+    http://www.orinoco.org/
+    http://cedema.org/
+    http://complotmagazine.com/
+    http://dialogo-americas.com/
+    https://globovision.com/
+    http://nmidigital.com/
+    http://www.descifrado.com/
+</code></pre>
+</li>
+</ul>
+<h3 id="local-storage">Local Storage</h3>
+<p>Is the same as a Web Request based, but the lists are retrieved from disk instead of using a web request, so you provide
+an absolute path in the server's disk to a file with a supported format (same formats as web request).</p>
+<h2 id="creating-a-new-list">Creating a new list</h2>
+<p>To create a new list, go to the admin panel and select "Url lists" table:</p>
+<p><img alt="Url Lists table" src="../../img/user_guide/find_urllist_table.png" /></p>
+<p>Here you can manage your lists. In this case, we're going to create a new one. Click the <strong>"ADD URL LIST +"</strong> 
+button in the top right corner of the page and we will go the list creation view: </p>
+<p><img alt="Url Lists Creation" src="../../img/user_guide/list_creation_form.png" /></p>
+<ol>
+<li>This field is just a <strong>human-readable name</strong> for your list, it should be unique among other lists</li>
+<li>
+<p>Here you specify how to retrieve the list content (see <a href="#storage_types">storage types</a>). </p>
+<ol>
+<li>If it is a <strong>web request based</strong>, then you use an url.  </li>
+<li>If it is <strong>local storage based</strong>, then you use an absolute path in your local disk</li>
+<li>If it is <strong>Database based</strong>, then ignore this field.</li>
+</ol>
+</li>
+<li>
+<p>Parse strategy tells the system how to read the list files when the storage type is eiter <strong>web request</strong> or <strong>local storage</strong>. Ignore if not any of this.</p>
+</li>
+<li>This field tells the system how this list will store its urls.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../user_guide/" class="btn btn-neutral float-left" title="User guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../anomaly_types/" class="btn btn-neutral float-right" title="Anomaly types">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../user_guide/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../anomaly_types/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
