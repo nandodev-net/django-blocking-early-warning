@@ -73,7 +73,8 @@ class HistogramBackendView(View):
                 {
                     "hour" : datetime.strftime(b.hour, DATE_FORMAT),
                     "total_count" : b.total_count,
-                    "anomaly_count" : b.anomaly_count
+                    "anomaly_count" : b.anomaly_count,
+                    "ok_count" : b.total_count - b.anomaly_count
                 } 
                 for b in histo
             ]
