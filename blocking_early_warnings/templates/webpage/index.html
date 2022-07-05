@@ -1,0 +1,95 @@
+{% extends 'webpage/base.html' %}
+
+{% block title %} Histogramas {% endblock title %}
+
+{% block subtitle %}
+{% endblock subtitle %}
+
+{% block content %}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-chart-bar me-1"></i>
+        Conteo de Anomalías
+    </div>
+    <div class="card-body"><canvas id="histogramChart" width="100%" height="40"></canvas></div>
+</div>
+
+{% endblock content %}
+
+{% block additional_js %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script>
+
+var labels = []
+var datasets = []
+
+$.get("{% url 'histogram_backend' %}", function(data, status){
+
+    var anomaly = {
+                label: "Anomaly",
+                backgroundColor: "rgba(200,50,50,1)",
+                borderColor: "rgba(200,50,50,1)",
+                data: [],
+              }
+
+    var ok = {
+                label: "Ok",
+                backgroundColor: "rgba(50,200,50,1)",
+                borderColor: "rgba(50,200,50,1)",
+                data: [],
+              }
+
+    for (var i=0; i < data.histogram.length ; i++){
+        labels.push(data.histogram[i].hour);
+        anomaly.data.push(data.histogram[i].anomaly_count)
+        ok.data.push(data.histogram[i].ok_count)
+
+    }
+
+    datasets.push(anomaly)
+    datasets.push(ok)
+
+    //console.log(datasets);
+
+  });
+
+  console.log(datasets);
+
+// Set new default font family and font color to mimic Bootstrap's default styling
+Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.global.defaultFontColor = '#292b2c';
+
+// Bar Chart Example
+var ctx = document.getElementById("histogramChart");
+var myLineChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: datasets,
+  },
+  options: {
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false
+        },
+        stacked: true
+      }],
+      yAxes: [{
+        gridLines: {
+          display: true
+        },
+        stacked: true,
+      }],
+    },
+    legend: {
+      display: true
+    }
+  }
+});
+
+</script>
+
+{% endblock additional_js %}
