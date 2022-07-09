@@ -13,7 +13,7 @@ class HistogramPageView(TemplateView):
     """view to display histograms with retrieved data from ooni
     """
 
-    template_name: str = "histogram.html"
+    template_name: str = "webpage/index.html"
 
 
 class HistogramBackendView(View):
