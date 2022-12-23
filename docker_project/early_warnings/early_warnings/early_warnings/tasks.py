@@ -3,6 +3,7 @@
 """
 # Python imports
 import datetime
+import celery
 import pytz
 
 # Third party imports

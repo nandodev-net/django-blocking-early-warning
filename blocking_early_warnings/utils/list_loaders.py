@@ -25,8 +25,6 @@ class ListLoader:
 
         for list in lists:
             # get urls for this source
-            # url_list = get_list_from_storage(list.source, list.storage_type)
-            # url_list = get_urls_from_list_content(url_list, list.parse_strategy)
             url_list = self.get_urls_from_list(list)
 
             # store url in map

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_celery_beat',
     'blocking_early_warnings'
 ]
 
@@ -145,7 +146,6 @@ from celery.schedules import crontab
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://redis:6379") # type: ignore 
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379") # type: ignore
 
-CELERY_BEAT_SCHEDULE = {
-}
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # --------------------------------------------------------
