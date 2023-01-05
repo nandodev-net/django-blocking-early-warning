@@ -24,7 +24,23 @@ better fits your use case
 
 ### Installing as a standalone app
 
-WIP: Standalone installation coming soon
+With this installation you will have a django server running this app in docker with a few commands. In order to do so, 
+**you'll need a valid [docker installation](https://docs.docker.com/engine/install/ubuntu/)** (and [post install](https://docs.docker.com/engine/install/linux-postinstall/) is highly recommended). You'll also need the [environment files](./user_guide/env_variables.md). Once you have these, follow the next steps to install the app:
+
+1. Download the code from the [official repository](https://github.com)
+        
+        git clone https://github.com/VEinteligente/django-blocking-early-warning.git
+
+2. Copy your [environment files](./user_guide/env_variables.md) into the root project directory.
+
+3. `cd` into the root project directory and run the docker installation script:
+
+        ./run_docker.sh
+
+With these steps, the app will be running, but we still need to run migrations in order for it to be useful. We can do this by running the script
+`migrate_db.sh` just like we did before with `run_docker.sh`. 
+
+And finally, now that we have initialized the database, we should create a super user to manage the site. We can do this by running the command `docker-compose -f docker-compose.yml exec web python manage.py createsuperuser`. Choose a user and password of your liking and you'll be all set!.
 
 ### Installing as part of your Django project
 
