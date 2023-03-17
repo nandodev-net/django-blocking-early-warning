@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "./run_web_service.sh"
+    volumes:
+      - static_volume:/home/vsf/web/staticfiles
+    expose:
+      - 8000
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - db
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.prod.db
+    hostname: postgres
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - static_volume:/home/vsf/web/staticfiles
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 1337:80
+      - 5555:5555
+    depends_on:
+      - web
+      - flower
+    hostname: nginx
+  redis:
+    image: redis:alpine
+    expose: 
+      - 6379
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A early_warnings worker -l info -s /tmp/celerybeat-schedule
+    volumes:
+      - ./docker_project/early_warnings/early_warnings:/web/docker_project/early_warnings/early_warnings
+    env_file:
+      - .env.prod.celery
+    depends_on:
+      - redis
+    restart: unless-stopped
+    
+  flower:
+    image: mher/flower
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+    expose:
+      - 5555
+    hostname: flower
+
+  celery-beat:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      command: celery -A early_warnings beat -l info -s /tmp/celerybeat-schedule
+      volumes:
+        - ./docker_project/early_warnings/early_warnings:/web/docker_project/early_warnings/early_warnings
+      env_file:
+        - .env.prod
+      depends_on:
+        - redis
+        - db
+      restart: unless-stopped
+
+volumes:
+  postgres_data:
+  static_volume:    
+
+
