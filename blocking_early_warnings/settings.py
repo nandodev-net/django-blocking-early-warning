@@ -24,3 +24,5 @@ MAIL_TO_NOTIFY = os.environ.get("BLOCKING_EARLY_WARNING_NOTIFY_MAIL")
 SENDER_MAIL = os.environ.get("BLOCKING_EARLY_WARNING_SENDER_MAIL")
 
 SENDER_MAIL_PSWD = os.environ.get("BLOCKING_EARLY_WARNING_SENDER_MAIL_PSWD")
+
+# If should use login required in views 

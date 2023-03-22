@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # -- Init env variables handler -------------
 import environ
 
@@ -65,7 +65,7 @@ ROOT_URLCONF = 'early_warnings.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -149,3 +149,8 @@ CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # --------------------------------------------------------
+
+# -- < Login Settings > ----------------------------------
+
+LOGIN_REDIRECT_URL = "/"
+EARLY_WARNINGS_LOGIN_REQUIRED = False
