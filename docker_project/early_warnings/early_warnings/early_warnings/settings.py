@@ -153,4 +153,4 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # -- < Login Settings > ----------------------------------
 
 LOGIN_REDIRECT_URL = "/"
-EARLY_WARNINGS_LOGIN_REQUIRED = False
+EARLY_WARNINGS_LOGIN_REQUIRED = True
