@@ -1,0 +1,194 @@
+{% extends "webpage/base.html" %}
+
+{% block title %} Datatable {% endblock title %}
+
+{% block subtitle %}
+{% endblock subtitle %}
+
+{% block content %}
+    <header>
+        <style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: #f0f0f0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #555;
+}
+
+th{
+    text-align: center;
+}
+
+thead {
+    background-color: #444;
+}
+
+thead th {
+    font-weight: bold;
+    color: #fff;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #333;
+}
+
+tbody tr:hover {
+    background-color: #555;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+button {
+    margin: 0 10px;
+    cursor: pointer;
+    background-color: #444;
+    border: 1px solid #555;
+    color: #f0f0f0;
+    padding: 5px 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    outline: none;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+a {
+    color: #f0f0f0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    display: inline-block;
+    margin: 0 5px;
+    padding: 8px 14px;
+    background-color: #444;
+    border: none;
+    border-radius: 10%;
+    color: #f0f0f0;
+    text-decoration: none;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.pagination a:hover {
+    background-color: #555;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pagination a.current {
+    font-weight: bold;
+    background-color: #555;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pagination a.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.histogram-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 8px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.histogram-btn:hover {
+    background-color: #5CD65C;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+        </style>
+    </header>
+    <div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>ASN</th>
+                <th>Date</th>
+                <th>Measurement</th>
+                <th>Anomaly</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dato in datos_paginados %}
+                <tr>
+                    <td>{{ dato.url }}</td>
+                    <td>{{ dato.asn }}</td>
+                    <td>{{ dato.hour }}</td>
+                    <td>{{ dato.measurement_count }}</td>
+                    <td>{{ dato.anomaly_count }}</td>
+                    <td><button class="histogram-btn">Histograma</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if datos_paginados.has_previous %}
+                <a href="?page=1">&laquo; Primera</a>
+                <a href="?page={{ datos_paginados.previous_page_number }}">Anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ datos_paginados.number }} de {{ datos_paginados.paginator.num_pages }}.
+            </span>
+
+            {% if datos_paginados.has_next %}
+                <a href="?page={{ datos_paginados.next_page_number }}">Siguiente</a>
+                <a href="?page={{ datos_paginados.paginator.num_pages }}">Última &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endblock %}
