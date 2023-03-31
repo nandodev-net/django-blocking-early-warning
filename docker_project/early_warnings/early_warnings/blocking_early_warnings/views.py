@@ -18,6 +18,35 @@ from django.db import connection
 
 
 def datatable_paginado(request):
+    """
+    Pagina y filtra los datos de una tabla en la base de datos y los muestra en una plantilla.
+    Args:
+        request (HttpRequest): Una solicitud HTTP que contiene información sobre la solicitud del usuario.
+    Returns:
+        HttpResponse: Una respuesta HTTP que contiene una plantilla HTML que muestra los datos de la tabla paginados y filtrados.
+    Raises:
+        DatabaseError: Si hay un error al ejecutar la consulta SQL en la base de datos.
+    """
+
+    def calculate_percentage(a: int, b: int) -> float:
+        """
+        Calcula el porcentaje que 'b' representa de 'a'.
+
+        Args:
+            a (int): El valor del cual se calcula el porcentaje.
+            b (int): El valor que representa el porcentaje de 'a'.
+
+        Returns:
+            float: El porcentaje que 'b' representa de 'a', como un número de punto flotante.
+
+        Raises:
+            ZeroDivisionError: Si 'a' es igual a cero.
+        """
+        if a == 0:
+            raise ZeroDivisionError("El valor de 'a' no puede ser cero.")
+        else:
+            return (b / a) * 100
+        
     # Construye la consulta SQL
     raw_sql = """ 
         WITH ranked_metrics AS (
@@ -71,16 +100,23 @@ def datatable_paginado(request):
             for row in cursor.fetchall()
         ]
     
-    print('HOLA',len(combined_queryset))
-
-
-    paginator = Paginator(combined_queryset, 20) # Muestra 20 registros por página
-
-  
-
+    # Pagina los resultados y los almacena en la variable 'datos_paginados'
+    paginator = Paginator(combined_queryset, 20)
     page = request.GET.get('page')
     datos_paginados = paginator.get_page(page)
- 
+
+    # calculando los porcentajes de una pagina de metricas
+    for obj in datos_paginados:
+        obj['percentage_2_days_ago'] = calculate_percentage(
+            obj['measurement_count_2_days_ago'],
+            obj['anomaly_count_2_days_ago']
+            )
+        obj['percentage_1_days_ago'] = calculate_percentage(
+            obj['measurement_count_1_days_ago'],
+            obj['anomaly_count_1_days_ago']
+        )
+
+    # Renderiza la plantilla 'webpage/datatable.html' con los resultados paginados
     return render(request, 'webpage/datatable.html', {'datos_paginados': datos_paginados})
 
 
