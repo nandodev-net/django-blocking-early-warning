@@ -18,11 +18,6 @@ from django.db import connection
 
 
 def datatable_paginado(request):
-
-    today = datetime.now().date()
-    fecha_antier = today - timedelta(days=2)
-    fecha_ayer = today - timedelta(days=1)
-
     # Construye la consulta SQL
     raw_sql = """ 
         WITH ranked_metrics AS (
@@ -35,19 +30,36 @@ def datatable_paginado(request):
             SELECT *
             FROM ranked_metrics
             WHERE rank = 1
+        ),
+        metrics_by_day AS (
+            SELECT
+                url_id,
+                asn_id,
+                COALESCE(MAX(CASE WHEN hour::date = current_date - INTERVAL '2 days' THEN anomaly_count END), 0) AS anomaly_count_2_days_ago,
+                COALESCE(MAX(CASE WHEN hour::date = current_date - INTERVAL '2 days' THEN measurement_count END), 0) AS measurement_count_2_days_ago,
+                MAX(CASE WHEN hour::date = current_date - INTERVAL '2 days' THEN hour END) AS hour_2_days_ago,
+                COALESCE(MAX(CASE WHEN hour::date = current_date - INTERVAL '1 days' THEN anomaly_count END), 0) AS anomaly_count_1_days_ago,
+                COALESCE(MAX(CASE WHEN hour::date = current_date - INTERVAL '1 days' THEN measurement_count END), 0) AS measurement_count_1_days_ago,
+                MAX(CASE WHEN hour::date = current_date - INTERVAL '1 days' THEN hour END) AS hour_1_days_ago
+            FROM filtered_metrics
+            GROUP BY url_id, asn_id
+        ),
+        results AS (
+            SELECT
+                url.url,
+                metrics.asn_id,
+                metrics.anomaly_count_2_days_ago,
+                metrics.measurement_count_2_days_ago,
+                metrics.hour_2_days_ago,
+                metrics.anomaly_count_1_days_ago,
+                metrics.measurement_count_1_days_ago,
+                metrics.hour_1_days_ago
+            FROM
+                metrics_by_day AS metrics
+            JOIN blocking_early_warnings_url AS url ON metrics.url_id = url.id
         )
-        SELECT
-            metric.id,
-            metric.url_id,
-            metric.measurement_count,
-            metric.anomaly_count,
-            metric.asn_id,
-            metric.hour,
-            url.url
-        FROM
-            filtered_metrics AS metric
-        JOIN blocking_early_warnings_url AS url ON metric.url_id = url.id
-        ORDER BY metric.anomaly_count DESC;
+        SELECT * FROM results
+        ORDER BY anomaly_count_1_days_ago DESC;
     """
 
     # Ejecuta la consulta SQL
@@ -58,6 +70,8 @@ def datatable_paginado(request):
             dict(zip(column_names, row))
             for row in cursor.fetchall()
         ]
+    
+    print('HOLA',len(combined_queryset))
 
 
     paginator = Paginator(combined_queryset, 20) # Muestra 20 registros por página
