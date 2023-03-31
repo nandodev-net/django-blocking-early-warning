@@ -12,6 +12,7 @@ from .models import Metric, Url
 from .raw_queries import raw_metric_name, raw_url_name, get_datatable
 from django.db.models import Max, Q, F, Subquery, OuterRef
 from django.db.models.functions import TruncDate
+from django.db import connection
 
 
 
@@ -22,31 +23,42 @@ def datatable_paginado(request):
     fecha_antier = today - timedelta(days=2)
     fecha_ayer = today - timedelta(days=1)
 
-    # Crea dos subconsultas para obtener la última métrica almacenada en cada día
-    latest_metric_antier = Metric.objects.filter(
-        hour__date=fecha_antier,
-        url=OuterRef('url'),
-        asn=OuterRef('asn'),
-    ).order_by('-hour').values('hour')[:1]
+    # Construye la consulta SQL
+    raw_sql = """ 
+        WITH ranked_metrics AS (
+            SELECT *,
+            ROW_NUMBER() OVER (PARTITION BY url_id, asn_id, date_trunc('day', hour) ORDER BY hour DESC) AS rank
+            FROM blocking_early_warnings_metric
+            WHERE hour::date IN (current_date - INTERVAL '2 days', current_date - INTERVAL '1 days')
+        ),
+        filtered_metrics AS (
+            SELECT *
+            FROM ranked_metrics
+            WHERE rank = 1
+        )
+        SELECT
+            metric.id,
+            metric.url_id,
+            metric.measurement_count,
+            metric.anomaly_count,
+            metric.asn_id,
+            metric.hour,
+            url.url
+        FROM
+            filtered_metrics AS metric
+        JOIN blocking_early_warnings_url AS url ON metric.url_id = url.id
+        ORDER BY metric.anomaly_count DESC;
+    """
 
-    latest_metric_ayer = Metric.objects.filter(
-        hour__date=fecha_ayer,
-        url=OuterRef('url'),
-        asn=OuterRef('asn'),
-    ).order_by('-hour').values('hour')[:1]
+    # Ejecuta la consulta SQL
+    with connection.cursor() as cursor:
+        cursor.execute(raw_sql)
+        column_names = [col[0] for col in cursor.description]
+        combined_queryset = [
+            dict(zip(column_names, row))
+            for row in cursor.fetchall()
+        ]
 
-    # Ejecuta las consultas principales para cada día y combina los resultados
-    queryset_antier = Metric.objects.filter(
-        hour__in=Subquery(latest_metric_antier)
-    ).select_related('url')
-
-    queryset_ayer = Metric.objects.filter(
-        hour__in=Subquery(latest_metric_ayer)
-    ).select_related('url')
-
-    combined_queryset = (queryset_antier.union(queryset_ayer)).order_by('url')
-
-    
 
     paginator = Paginator(combined_queryset, 20) # Muestra 20 registros por página
 
