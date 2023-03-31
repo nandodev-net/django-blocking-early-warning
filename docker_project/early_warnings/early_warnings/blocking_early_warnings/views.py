@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, time
 from django.shortcuts import render
 from django.views.generic import TemplateView, View
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, JsonResponse
@@ -8,16 +8,53 @@ from blocking_early_warnings.settings import DATE_FORMAT
 # Local imports
 from blocking_early_warnings.utils.histogram_generator import HistogramGenerator
 from django.core.paginator import Paginator
-from .models import Metric
+from .models import Metric, Url
+from .raw_queries import raw_metric_name, raw_url_name, get_datatable
+from django.db.models import Max, Q, F, Subquery, OuterRef
+from django.db.models.functions import TruncDate
+
+
 
 
 def datatable_paginado(request):
-    queryset = Metric.objects.filter(measurement_count__isnull=False).order_by('anomaly_count').reverse()
-    paginator = Paginator(queryset, 20) # Muestra 20 registros por página
+
+    today = datetime.now().date()
+    fecha_antier = today - timedelta(days=2)
+    fecha_ayer = today - timedelta(days=1)
+
+    # Crea dos subconsultas para obtener la última métrica almacenada en cada día
+    latest_metric_antier = Metric.objects.filter(
+        hour__date=fecha_antier,
+        url=OuterRef('url'),
+        asn=OuterRef('asn'),
+    ).order_by('-hour').values('hour')[:1]
+
+    latest_metric_ayer = Metric.objects.filter(
+        hour__date=fecha_ayer,
+        url=OuterRef('url'),
+        asn=OuterRef('asn'),
+    ).order_by('-hour').values('hour')[:1]
+
+    # Ejecuta las consultas principales para cada día y combina los resultados
+    queryset_antier = Metric.objects.filter(
+        hour__in=Subquery(latest_metric_antier)
+    ).select_related('url')
+
+    queryset_ayer = Metric.objects.filter(
+        hour__in=Subquery(latest_metric_ayer)
+    ).select_related('url')
+
+    combined_queryset = (queryset_antier.union(queryset_ayer)).order_by('url')
+
+    
+
+    paginator = Paginator(combined_queryset, 20) # Muestra 20 registros por página
+
+  
 
     page = request.GET.get('page')
     datos_paginados = paginator.get_page(page)
-
+ 
     return render(request, 'webpage/datatable.html', {'datos_paginados': datos_paginados})
 
 
