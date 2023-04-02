@@ -21,7 +21,7 @@ def login_required_check(view : Type[View]):
     return view.as_view()
 
 urlpatterns = [
-    path("", login_required_check(HistogramPageView)), # Main page displaying histograms
+    path("", login_required_check(HistogramPageView), name="histogram_main"), # Main page displaying histograms
     path("histogram", login_required_check(HistogramBackendView), name="histogram_backend"), # Backend to fill histograms view
     path('datatable_paginado/', datatable_paginado, name='datatable_paginado'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
