@@ -2,16 +2,11 @@ from datetime import datetime, timedelta, time
 from django.shortcuts import render
 from django.views.generic import TemplateView, View
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, JsonResponse
-from requests import Response
 from blocking_early_warnings.settings import DATE_FORMAT
 
 # Local imports
 from blocking_early_warnings.utils.histogram_generator import HistogramGenerator
 from django.core.paginator import Paginator
-from .models import Metric, Url
-from .raw_queries import raw_metric_name, raw_url_name, get_datatable
-from django.db.models import Max, Q, F, Subquery, OuterRef
-from django.db.models.functions import TruncDate
 from django.db import connection
 
 
@@ -45,7 +40,11 @@ def datatable_paginado(request):
         if a == 0:
             raise ZeroDivisionError("El valor de 'a' no puede ser cero.")
         else:
-            return (b / a) * 100
+            percentage = (b / a) * 100
+            if percentage.is_integer():
+                return int(percentage)
+            else:
+                return round(percentage, 1)
         
     # Construye la consulta SQL
     raw_sql = """ 
@@ -76,6 +75,8 @@ def datatable_paginado(request):
         results AS (
             SELECT
                 url.url,
+                asn.code AS asn_code,
+                asn.name AS asn_name,
                 metrics.asn_id,
                 metrics.anomaly_count_2_days_ago,
                 metrics.measurement_count_2_days_ago,
@@ -86,6 +87,7 @@ def datatable_paginado(request):
             FROM
                 metrics_by_day AS metrics
             JOIN blocking_early_warnings_url AS url ON metrics.url_id = url.id
+            JOIN blocking_early_warnings_asn AS asn ON metrics.asn_id = asn.id
         )
         SELECT * FROM results
         ORDER BY anomaly_count_1_days_ago DESC;
@@ -101,7 +103,7 @@ def datatable_paginado(request):
         ]
     
     # Pagina los resultados y los almacena en la variable 'datos_paginados'
-    paginator = Paginator(combined_queryset, 20)
+    paginator = Paginator(combined_queryset, 10)
     page = request.GET.get('page')
     datos_paginados = paginator.get_page(page)
 

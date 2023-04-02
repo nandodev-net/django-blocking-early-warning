@@ -34,7 +34,7 @@ DEBUG = int(env("DEBUG", default=1)) # type: ignore
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")  # type: ignore
 print(ALLOWED_HOSTS)
-CSRF_TRUSTED_ORIGINS = origins.split(" ") if (origins := env("CSRF_TRUSTED_ORIGINS", default="")) else [] # type: ignore
+CSRF_TRUSTED_ORIGINS = ['http://localhost:1337'] 
 
 # Application definition
 
