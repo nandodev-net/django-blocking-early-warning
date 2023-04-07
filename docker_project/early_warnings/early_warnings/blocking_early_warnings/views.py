@@ -38,7 +38,7 @@ def datatable_paginado(request):
             ZeroDivisionError: Si 'a' es igual a cero.
         """
         if a == 0:
-            raise ZeroDivisionError("El valor de 'a' no puede ser cero.")
+            pass
         else:
             percentage = (b / a) * 100
             if percentage.is_integer():

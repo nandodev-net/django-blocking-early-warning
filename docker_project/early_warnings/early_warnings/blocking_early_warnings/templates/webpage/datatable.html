@@ -261,7 +261,11 @@
                         </span>
                     </td>
                     <td class="tdcenter"class="tdcenter">
-                        <span class="celltooltip">{{ dato.percentage_2_days_ago }}%
+                        {% if dato.percentage_2_days_ago is none %}
+                            <span class="celltooltip">{{ dato.percentage_2_days_ago }}
+                        {% else %}
+                            <span class="celltooltip">{{ dato.percentage_2_days_ago }}%
+                        {% endif %}
                             <ul class="tooltiptext">
                             <li><span class="bullet" style="background-color: #6ab04c;"></span> Measurements: {{ dato.measurement_count_2_days_ago }}</li>
                             <li><span class="bullet" style="background-color: #ff6b6b;"></span> Anomalies: {{ dato.anomaly_count_2_days_ago }}</li>
@@ -271,7 +275,11 @@
                         </span>
                     </td>
                     <td class="tdcenter">
-                        <span class="celltooltip">{{ dato.percentage_1_days_ago }}%
+                        {% if dato.percentage_2_days_ago is none %}
+                            <span class="celltooltip">{{ dato.percentage_1_days_ago }}
+                        {% else %}
+                            <span class="celltooltip">{{ dato.percentage_1_days_ago }}%
+                        {% endif %}
                             <ul class="tooltiptext">
                                 <li><span class="bullet" style="background-color: #6ab04c;"></span> Measurements: {{ dato.measurement_count_1_days_ago }}</li>
                                 <li><span class="bullet" style="background-color: #ff6b6b;"></span> Anomalies: {{ dato.anomaly_count_1_days_ago }}</li>
