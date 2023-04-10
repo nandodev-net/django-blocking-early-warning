@@ -128,3 +128,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+docker_project/early_warnings/early_warnings/run_web_service.sh
