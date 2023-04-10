@@ -11,6 +11,8 @@ fi
 
 if [[ $* == *--dev* ]] 
 then 
+    cp ./run_web_service.sh ./docker_project/early_warnings/early_warnings
+    chmod +x ./docker_project/early_warnings/early_warnings/run_web_service.sh
     DOCKERCOMPOSE_FILE=docker-compose.dev.yml
 else 
     DOCKERCOMPOSE_FILE=docker-compose.yml 
