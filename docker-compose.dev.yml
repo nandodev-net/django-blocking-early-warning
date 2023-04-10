@@ -9,6 +9,7 @@ services:
     volumes:
       - static_volume:/home/vsf/web/staticfiles
       - ./docker_project/early_warnings/early_warnings:/home/vsf/web/docker_project/early_warnings/early_warnings
+      - ./blocking_early_warnings:/home/vsf/web/early_warnings/blocking_early_warnings
     expose:
       - 8000
     env_file:
