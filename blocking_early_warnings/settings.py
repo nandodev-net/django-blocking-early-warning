@@ -9,9 +9,9 @@ NUMBER_OF_HOURS = 24
 # ooni endpoit to request data from
 OONI_ENDPOINT = "https://api.ooni.io/api/v1/measurements"
 
-# Date format
+# Date format used internally to represent dates from ooni. Not to be confused
+# with how it displays in the front end
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-DATE_FORMAT = '%d/%m/%Y - %H:%M'
 
 # Country code of interesting country
 COUNTRY_CODE = "VE"
