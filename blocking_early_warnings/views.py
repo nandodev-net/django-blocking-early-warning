@@ -185,7 +185,7 @@ class HistogramBackendView(View):
             "asn" : asn,
             "histogram" : [
                 {
-                    "hour" : datetime.strftime(b.hour, DATE_FORMAT),
+                    "hour" : datetime.strftime(b.hour, "%d/%m/%Y - %H:%M"),
                     "total_count" : b.total_count,
                     "anomaly_count" : b.anomaly_count,
                     "ok_count" : b.total_count - b.anomaly_count
