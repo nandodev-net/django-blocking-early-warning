@@ -74,6 +74,15 @@ class UrlList(models.Model):
     def __str__(self) -> str:
         return self.__repr__()
 
+class Site(models.Model):
+    name = models.CharField(unique=True, null=False, max_length=40)
+    description_eng = models.TextField(     # A simple English description for this site (optional)
+                    null = True,
+                    blank = True 
+            )
+    
+    def __str__(self) -> str:
+        return f"[{self.name}]"
 
 class Url(models.Model):
     """
@@ -97,6 +106,7 @@ class Url(models.Model):
     )
 
     url = models.TextField(max_length=100, null=False, unique=True)
+    site = models.ForeignKey(Site, null=True, on_delete=models.DO_NOTHING, related_name='urls')
     lists = models.ManyToManyField(to=UrlList)
 
     def __repr__(self) -> str:

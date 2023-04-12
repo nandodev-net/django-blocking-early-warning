@@ -9,7 +9,8 @@ NUMBER_OF_HOURS = 24
 # ooni endpoit to request data from
 OONI_ENDPOINT = "https://api.ooni.io/api/v1/measurements"
 
-# Date format
+# Date format used internally to represent dates from ooni. Not to be confused
+# with how it displays in the front end
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 # Country code of interesting country
@@ -24,3 +25,5 @@ MAIL_TO_NOTIFY = os.environ.get("BLOCKING_EARLY_WARNING_NOTIFY_MAIL")
 SENDER_MAIL = os.environ.get("BLOCKING_EARLY_WARNING_SENDER_MAIL")
 
 SENDER_MAIL_PSWD = os.environ.get("BLOCKING_EARLY_WARNING_SENDER_MAIL_PSWD")
+
+# If should use login required in views 

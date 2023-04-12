@@ -7,6 +7,8 @@ nav:
     - user_guide/user_guide.md
     - user_guide/url_lists.md
     - user_guide/anomaly_types.md
+    - user_guide/asynch_tasks.md
+    - user_guide/env_variables.md
 
 theme: readthedocs
 

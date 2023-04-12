@@ -20,5 +20,6 @@ class MetricAdmin(admin.ModelAdmin):
 
 admin.site.register(UrlList, UrlListAdmin)
 admin.site.register(Url, UrlAdmin)
+admin.site.register(Site)
 admin.site.register(ASN, AsnAdmin)
 admin.site.register(Metric, MetricAdmin)
